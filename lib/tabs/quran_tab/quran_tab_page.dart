@@ -23,22 +23,19 @@ class _QuranTabPageState extends State<QuranTabPage> {
   List<SuraModel> _filteredSuras = QuranData.suras;
 
   void _onSearchChanged(String searchText) {
- setState(() {
-   if (searchText.isEmpty) {
-     _filteredSuras = QuranData.suras;
-   } else {
-     _filteredSuras = QuranData.suras.where(
-           (sura) {
-         final query = searchText.toLowerCase();
-         return sura.enName.toLowerCase().contains(searchText) ||
-             sura.arName.toLowerCase().contains(searchText) ||
-             sura.number.toString() == searchText;
-       },
-     ).toList();
-   }
- });
+    setState(() {
+      if (searchText.isEmpty) {
+        _filteredSuras = QuranData.suras;
+      } else {
+        final query = searchText.toLowerCase().trim(); // trim whitespace too
+        _filteredSuras = QuranData.suras.where((sura) {
+          return sura.enName.toLowerCase().contains(query) ||
+              sura.arName.toLowerCase().contains(query) ||
+              sura.number.toString() == query;
+        }).toList();
+      }
+    });
   }
-
   // a
   //A
 
