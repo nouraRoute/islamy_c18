@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:islamy/data/models/sura_model.dart';
 import 'package:islamy/data/quran_data.dart';
 import 'package:islamy/gen/assets.gen.dart';
+import 'package:islamy/tabs/quran_tab/sura_details_page.dart';
 
 class SurasListSection extends StatelessWidget {
   const SurasListSection({super.key, required this.suras});
@@ -11,9 +12,8 @@ class SurasListSection extends StatelessWidget {
   final List<SuraModel> suras;
   @override
   Widget build(BuildContext context) {
-    return    SliverMainAxisGroup(
-      
-       slivers: [
+    return SliverMainAxisGroup(
+      slivers: [
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 10.0),
@@ -29,13 +29,13 @@ class SurasListSection extends StatelessWidget {
         ),
         SliverList.builder(
           itemCount: suras.length,
-
           itemBuilder: (context, index) {
-            print('--->$index');
             var sura = suras[index];
             return ListTile(
               minVerticalPadding: 0,
               contentPadding: EdgeInsets.all(0),
+              onTap: () => Navigator.of(context)
+                  .pushNamed(SuraDetailsPage.routeName, arguments: sura),
               title: Text(
                 sura.enName,
                 style: TextStyle(
@@ -65,7 +65,7 @@ class SurasListSection extends StatelessWidget {
                 children: [
                   SvgPicture.asset(Assets.verseIcon),
                   Text(
-                   sura.number.toString() ,
+                    sura.number.toString(),
                     style: TextStyle(
                       fontSize: index > 99 ? 16 : 20,
                       fontWeight: FontWeight.bold,
