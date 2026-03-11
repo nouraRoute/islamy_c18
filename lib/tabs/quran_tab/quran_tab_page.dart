@@ -10,6 +10,7 @@ import 'package:islamy/gen/assets.gen.dart';
 import 'package:islamy/tabs/quran_tab/widgets/custom_text_field.dart';
 import 'package:islamy/tabs/quran_tab/widgets/most_recent_section.dart';
 import 'package:islamy/tabs/quran_tab/widgets/suras_list_section.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class QuranTabPage extends StatefulWidget {
   const QuranTabPage({super.key});
@@ -21,7 +22,7 @@ class QuranTabPage extends StatefulWidget {
 class _QuranTabPageState extends State<QuranTabPage> {
   final TextEditingController controller = TextEditingController();
   List<SuraModel> _filteredSuras = QuranData.suras;
-
+  List<SuraModel> _mostRecentSuras = [];
   void _onSearchChanged(String searchText) {
     setState(() {
       if (searchText.isEmpty) {
@@ -36,8 +37,16 @@ class _QuranTabPageState extends State<QuranTabPage> {
       }
     });
   }
+
   // a
   //A
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    _getMosRecentSuras();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +62,7 @@ class _QuranTabPageState extends State<QuranTabPage> {
                 SliverToBoxAdapter(child: SizedBox(height: 20)),
                 SliverToBoxAdapter(
                   child: CustomTextField(
-                    onChanged:  _onSearchChanged ,
+                    onChanged: _onSearchChanged,
                     // onSubmitted: _onSearchChanged,
                     controller: controller,
                     hintText: "Sura Name",
@@ -69,14 +78,52 @@ class _QuranTabPageState extends State<QuranTabPage> {
                     ),
                   ),
                 ),
-                SliverToBoxAdapter(child: MostRecentSection()),
-                SurasListSection(suras: _filteredSuras,),
+                SliverToBoxAdapter(
+                    child: MostRecentSection(
+                  mostRecent: _mostRecentSuras,
+                )),
+                SurasListSection(
+                  suras: _filteredSuras,
+                  onTap: _updateMostRecent,
+                ),
               ],
             ),
           ),
         ),
       ],
     );
+  }
+
+  Future<void> _getMosRecentSuras() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+
+    List<String> mostRecent =
+        sharedPreferences.getStringList("mostRecent") ?? [];
+    print('-->${mostRecent}');
+    List<SuraModel> mostRecentSuras = [];
+    for (var i = 0; i < mostRecent.length; i++) {
+      int surasNumber = int.parse(mostRecent[i]);
+      SuraModel suraModel = QuranData.suras.firstWhere(
+        (sura) => sura.number == surasNumber,
+      );
+
+      mostRecentSuras.add(suraModel);
+    }
+    print('mostRecentSuras-->${mostRecentSuras.length}');
+
+    _mostRecentSuras = mostRecentSuras;
+    setState(() {});
+  }
+
+  Future<void> _updateMostRecent(SuraModel sura) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    List<String> mostRecent =
+        sharedPreferences.getStringList("mostRecent") ?? [];
+    mostRecent.insert(0, sura.number.toString());
+    Set<String> mostRecentSet = mostRecent.toSet();
+    mostRecent = mostRecentSet.toList();
+    await sharedPreferences.setStringList("mostRecent", mostRecent);
+    await _getMosRecentSuras();
   }
 }
 //listview OR singlechildescrollview

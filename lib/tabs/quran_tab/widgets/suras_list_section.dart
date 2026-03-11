@@ -7,8 +7,8 @@ import 'package:islamy/gen/assets.gen.dart';
 import 'package:islamy/tabs/quran_tab/sura_details_page.dart';
 
 class SurasListSection extends StatelessWidget {
-  const SurasListSection({super.key, required this.suras});
-
+  const SurasListSection({super.key, required this.suras, required this.onTap});
+  final Future<void> Function(SuraModel) onTap;
   final List<SuraModel> suras;
   @override
   Widget build(BuildContext context) {
@@ -29,13 +29,20 @@ class SurasListSection extends StatelessWidget {
         ),
         SliverList.builder(
           itemCount: suras.length,
-          itemBuilder: (context, index) {
+          itemBuilder: (ctx, index) {
             var sura = suras[index];
             return ListTile(
               minVerticalPadding: 0,
               contentPadding: EdgeInsets.all(0),
-              onTap: () => Navigator.of(context)
-                  .pushNamed(SuraDetailsPage.routeName, arguments: sura),
+              onTap: () async {
+                Navigator.of(ctx)
+                    .pushNamed(SuraDetailsPage.routeName, arguments: sura)
+                    .then(
+                  (value) {
+                    onTap(sura);
+                  },
+                );
+              },
               title: Text(
                 sura.enName,
                 style: TextStyle(

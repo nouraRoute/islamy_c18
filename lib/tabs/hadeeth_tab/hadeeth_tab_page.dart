@@ -50,7 +50,7 @@ class _HadeethTabPageState extends State<HadeethTabPage> {
                     },
                     controller: _controller,
                     scrollDirection: Axis.horizontal,
-                    itemCount: 10,
+                    itemCount: hadeethModelLis.length,
                     itemBuilder: (context, index) {
                       bool isActive = index == currantPAge;
 
